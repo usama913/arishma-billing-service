@@ -1,0 +1,12 @@
+using Arishma.Billing.Application;
+using Arishma.Billing.Infrastructure;
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddHealthChecks();
+builder.Services.AddPersistence(builder.Configuration);
+var app = builder.Build();
+app.MapHealthChecks("/health");
+app.MapGet("/", (DatabaseSettings s) => new ServiceInfoDto("Billing", "billing.arishmasolutions.com", "Phase 0 scaffold - DDD, separate repo", s.Provider.ToString()));
+app.MapGet("/api/v1/service", (DatabaseSettings s) => new ServiceInfoDto("Billing", "billing.arishmasolutions.com", "Phase 0 scaffold", s.Provider.ToString()));
+app.MapGet("/api/v1/subscriptions", (ISubscriptionRepository repo) => repo.ListAsync());
+app.MapGet("/api/v1/plans", () => new[] { new { name = "Free", priceUsdPerMonth = 0, verifiedLeads = 50 }, new { name = "Starter", priceUsdPerMonth = 9, verifiedLeads = 300 }, new { name = "Growth", priceUsdPerMonth = 29, verifiedLeads = 1500 }, new { name = "Agency", priceUsdPerMonth = 79, verifiedLeads = 6000 } });
+app.Run();
